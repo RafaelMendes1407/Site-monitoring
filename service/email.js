@@ -2,6 +2,7 @@ require('dotenv').config({
     path: '../.env'
 });
 
+const queue = require('../queue/rabbitmq');
 const nm = require('nodemailer');
 
 const sender = nm.createTransport({
@@ -24,19 +25,15 @@ const email = function (to, subject, text) {
     };
 }
 
-const sendMsg = email('rafael.m1407@gmail.com', 'Serviço Ativo', 'O Serviço ja se encontra disponivel!');
+const callback = (err) => err ? console.log(err) : console.log('Email enviado com Sucesso!');
 
-const sendEmail = sender.sendMail(sendMsg, function (error) {
-    if (error) {
-        return error;
-    } else {
-        return 'Email enviado com Sucesso!'
-    }
+function sendMsg(msg) {
+    sender.sendMail(msg, () => callback());
+}
+
+
+queue.consume('websiteStatus', message => {
+    console.log("Processing " + message.content.toString());
+    const msg = email('rafael.m1407@gmail.com', 'Disponibilidade de Serviço', 'O serviço solicitado ja se encontra disponivel!');
+    sendMsg(msg);
 });
-
-console.log(sendEmail);
-
-module.exports = {
-    sendEmail,
-    email
-};

@@ -7,5 +7,5 @@ app.listen(port);
 
 console.log(`Server started on port ${port}`);
 
-setInterval(() => task(), 3000);
+setInterval(() => task(), 30000);
 
